@@ -1,0 +1,68 @@
+version: '3.8'
+
+services:
+  order:
+    build:
+      context: ./OrderService
+      dockerfile: ./docker/php/Dockerfile
+    container_name: order_service
+    volumes:
+      - ./OrderService:/var/www
+    depends_on:
+      - db
+  
+
+  notification:
+    build:
+      context: ./NotificationService
+      dockerfile: ./docker/php/Dockerfile
+    container_name: notification_service
+    volumes:
+      - ./NotificationService:/var/www
+    depends_on:
+      - db
+
+
+
+  web:
+    image: nginx:alpine
+    container_name: laravel9_web
+    ports:
+      - "8000:80"
+    volumes:
+      - .:/var/www
+      - ./OrderService/docker/nginx/default.conf:/etc/nginx/conf.d/default.conf
+    depends_on:
+      - order
+
+  db:
+    image: mysql:8.0
+    container_name: laravel9_db
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: laravel
+      MYSQL_USER: laravel
+      MYSQL_PASSWORD: secret
+    ports:
+      - "3309:3309"
+    volumes:
+      - db_data:/var/lib/mysql
+
+  rabbitmq:
+      image: rabbitmq:3-management
+      container_name: laravel9_rabbitmq
+      ports:
+        - "5672:5672"     # AMQP protocol port
+        - "15672:15672"   # RabbitMQ management UI port
+      environment:
+        RABBITMQ_DEFAULT_USER: guest
+        RABBITMQ_DEFAULT_PASS: guest
+      volumes:
+        - rabbitmq_data:/var/lib/rabbitmq
+
+volumes:
+  db_data:
+  rabbitmq_data:
+
+
