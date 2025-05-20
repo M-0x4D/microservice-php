@@ -34,10 +34,11 @@ class consumer extends Command
 
         $channel->queue_declare('hello', false, false, false, false);
 
-        echo " [*] Waiting for messages. To exit press CTRL+C\n";
+        // echo " [*] Waiting for messages. To exit press CTRL+C\n";
 
         $callback = function ($msg) {
-            echo ' [x] Received ', $msg->body, "\n";
+            // echo ' [x] Received ', $msg->body, "\n";
+            logger($msg->body);
         };
 
         $channel->basic_consume('hello', '', false, true, false, false, $callback);
@@ -45,7 +46,7 @@ class consumer extends Command
         try {
             $channel->consume();
         } catch (\Throwable $exception) {
-            echo $exception->getMessage();
+            // echo $exception->getMessage();
         }
     }
 }

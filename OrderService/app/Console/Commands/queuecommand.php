@@ -33,10 +33,10 @@ class queuecommand extends Command
 
             $channel->queue_declare('hello', false, false, false, false);
 
-            $msg = new AMQPMessage('Hello FAKE!');
+            $msg = new AMQPMessage('Hello kyrollos!');
             $channel->basic_publish($msg, '', 'hello');
 
-            echo " [x] Sent" . $msg->body . PHP_EOL;
+            echo " [x] Sent " . $msg->body . PHP_EOL;
 
             $channel->close();
             $connection->close();
